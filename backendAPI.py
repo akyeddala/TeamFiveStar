@@ -2,12 +2,14 @@
 # python -m pip install flask
 
 from flask import Flask, request, jsonify
+from userAuth import login_manager, register_user, login, logout
 # from .getSchedules import * #fucking jank ass python import
 import psycopg2
 import json
 # from match_schedules import ScheduleBuildAndMatch
 import numpy
 app = Flask(__name__)
+login_manager.init_app(app)
 
 
 #returns a connection with the master account
@@ -403,6 +405,21 @@ def piss(urine):
             return jsonify(2)
 
 # ACTUAL ENDPOINTS + FUNCTIONS
+
+# register
+@app.route('/register', methods=['POST'])
+def register():
+    return register_user()
+
+# login
+@app.route('/login', methods=['POST'])
+def user_login():
+    return login()
+
+# logout
+@app.route('/logout')
+def user_logout():
+    return logout()
 
 # handles user related stuff
 @app.route('/users/', methods=['GET', 'POST', 'PATCH', 'DELETE'])
