@@ -4,7 +4,29 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import psycopg2
 import re
 
-from backendAPI import readConnect, writeConnect
+# from backendAPI import readConnect, writeConnect
+# Can't import due to circular import
+
+#returns a connection with the master account
+#remove in final version and replace with some account that only has permission to make, delete, and update table entries in the officehours db
+def connect():
+    return psycopg2.connect(
+        host = "database-1.cbvvlg2e7uis.us-east-2.rds.amazonaws.com",
+        database = "office-hours",
+        user = "fivestar",
+        password = "O6OKCxDLB4Ij2zETe2Al")
+
+#returns a read only connection to the database
+# DO LATER
+def readConnect():
+    return connect().cursor()
+
+#returns a writable connection to the database
+# DO LATER
+#not sure how to implement, is it pretty much just only access to the office-hours database+no ability to make/delete tables?
+def writeConnect():
+    return connect()
+
 
 # Initialize the login manager
 login_manager = LoginManager()
@@ -26,6 +48,10 @@ def user_loader(email):
     user.id = email
     return user
 
+# @login_manager.unauthorized_handler()
+# def unauthorized_handler():
+#     return {"error":'Unauthorized'}, 401
+
 # Function to register a new user
 def register_user(email, password, is_teacher):
     
@@ -37,21 +63,23 @@ def register_user(email, password, is_teacher):
         return jsonify({"error": message}), 400
     
     
-    role = True if is_teacher.lower() == 'true' else False
+    # role = True if is_teacher.lower() == 'true' else False
+    # role = is_teacher
 
     hashed_password = generate_password_hash(password)
     try:
         con = writeConnect()
         cur = con.cursor()
-        cur.execute("INSERT INTO users (email, password, role) VALUES (%s, %s, %s);", (email, hashed_password, role))
+        #cur.execute("INSERT INTO users (email, password, role) VALUES (%s, %s, %s);", (email, hashed_password, role))
+        cur.execute("INSERT INTO users VALUES ('" + email + "','" + hashed_password + "',''," + str(is_teacher) + ");")
         con.commit()
         return jsonify({"message": "User registered successfully"})
     except psycopg2.IntegrityError:
         return jsonify({"error": "Email already in use"}), 409
 
 # Login function
-def login():
-    req = request.get_json()
+def login(req):
+    # req = request.get_json()
     email = req.get('email')
     password = req.get('password')
 
@@ -90,9 +118,16 @@ def validate_password(password):
     if not re.search("[0-9]", password):
         return False, "Password must include numbers."
 
-    if not re.search("[!@#$%^&*(),.?\":{}|<>]", password):
+    #if not re.search("[!@#$%^&*(),.?\":{}|<>]", password):
+    #    return False, "Password must include special characters."
+    SPECIAL_CHARS = ["[", "!", "@", "#", "$", "%", "^", "&", "*", "(", ")", ",", ".", "?", "\"", ":", "{", "}", "|", "<", ">", "]"]
+    find = False
+    for i in range(len(SPECIAL_CHARS)):
+        if(-1 < password.find(SPECIAL_CHARS[i])):
+            find = True
+            break
+    if(not find):
         return False, "Password must include special characters."
-
     return True, "Password is valid."
 
 def is_valid_umass_email(email):
