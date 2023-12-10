@@ -85,6 +85,14 @@ def containsForbidden(string):
             return True
     return False
 
+#getIndexOfOfficeHours
+def getOfficeHoursIndex(office_hours):
+    indexes = []
+    for i in range(60):
+        if(office_hours[i] == 5):
+            indexes.append(i)
+    return indexes
+
 #returns the teachers from a class
 def getTeachers(classid):
     if(not checkExists("classes", "classid=" + str(classid))):
@@ -95,6 +103,42 @@ def getTeachers(classid):
     if ret == None:
         return []
     return ret
+
+#returns a dictionary with teacher and assigned days (0 in monday, 4 is friday) of who is teaching that week
+def whoIsTeaching(classid):
+    office_hours = getClassOfficeHours(classid)
+    office_hours_indexes = getOfficeHoursIndex(office_hours)
+    teachers = getTeachers(classid)
+    number_of_teachers = len(teachers)
+    teacher_schedules = getTeacherSchedules(classid)
+    who_is_teaching = []
+   
+    for i in range(len(office_hours_indexes)):
+        available_teachers = []
+        for teacher in range(number_of_teachers):
+            if(teacher_schedules[teacher][office_hours_indexes[i] + 1]):
+                available_teachers.append(teacher_schedules[teacher][0])
+        who_is_teaching.append(available_teachers)
+        
+    teacher_counts = {}
+    for day in who_is_teaching:
+        for teacher in day:
+            if teacher in teacher_counts:
+                teacher_counts[teacher] += 1
+            else:
+                teacher_counts[teacher] = 1
+
+    total_days = len(who_is_teaching)
+    desired_count_per_teacher = total_days // len(teacher_counts)
+    assigned_days = {teacher: [] for teacher in teacher_counts}
+
+    for day_index, day in enumerate(who_is_teaching):
+        for teacher in day:
+            if len(assigned_days[teacher]) < desired_count_per_teacher:
+                assigned_days[teacher].append(day_index)
+                break
+            
+    return assigned_days
 
 #returns the schedules of a class
 def getSchedules(classid, teacher):
@@ -726,10 +770,13 @@ def C1():
                         }
                 case 'officehours':
                     details = getClassOfficeHours(req['id'])
+                    teacher_array = whoIsTeaching(req['id'])
                     if(details == -1):
                         return {"status":-1}, 404
+                    
                     return {
                         "officehours":(details[0:12], details[12:24], details[24:36], details[36:48], details[48:60]),
+                        "instructors for each day": teacher_array,
                         "status":0
                         }
                 case _:
