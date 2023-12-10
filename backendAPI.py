@@ -85,6 +85,17 @@ def containsForbidden(string):
             return True
     return False
 
+#returns the teachers from a class
+def getTeachers(classid):
+    if(not checkExists("classes", "classid=" + str(classid))):
+        return -1
+    cur = readConnect()
+    cur.execute("select email from userclasses where classID=" + str(classid) + " and role=true;")
+    ret = cur.fetchall()
+    if ret == None:
+        return []
+    return ret
+
 #returns the schedules of a class
 def getSchedules(classid, teacher):
     if(not checkExists("classes", "classid=" + str(classid))):
