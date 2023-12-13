@@ -5,6 +5,8 @@
 /.pnp
 .pnp.js
 
+/flask_session
+
 # testing
 /coverage
 

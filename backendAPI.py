@@ -8,10 +8,16 @@ import psycopg2
 import json
 import numpy
 from flask_login import login_required, current_user
+from flask_jwt_extended import JWTManager
 from werkzeug.security import generate_password_hash, check_password_hash
 app = Flask(__name__)
 login_manager.init_app(app)
 app.secret_key = "joe mama is a box of rocks superglued to a donkey's anus"
+
+# Configure JWT
+app.config['JWT_SECRET_KEY'] = 'joe mama is a box of rocks superglued to a'
+jwt = JWTManager(app)
+
 # would be best to randomize this or something
 
 #returns a connection with the master account
