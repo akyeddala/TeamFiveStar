@@ -179,6 +179,12 @@ def login(req):
     cur = readConnect()
     cur.execute("SELECT * FROM users WHERE email = %s;", (email,))
     user_record = cur.fetchone()
+    
+    if not user_record:
+        return jsonify({"status": "Account does not exist"}), 401
+    
+    if not check_password_hash(user_record[1], password):
+        return jsonify({"status": "Password is not correct"}), 401    
 
 
     if user_record and check_password_hash(user_record[1], password):
@@ -206,8 +212,6 @@ def login(req):
 def logout():
     logout_user()
     return jsonify({"status": "logged out"})
-
-
 
 
 def validate_password(password):
