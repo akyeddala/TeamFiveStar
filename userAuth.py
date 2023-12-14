@@ -102,14 +102,13 @@ def register_user(email, password, is_teacher):
         # #cur.execute("INSERT INTO users (email, password, role) VALUES (%s, %s, %s);", (email, hashed_password, role))
         # # cur.execute("INSERT INTO users VALUES ('" + email + "','" + hashed_password + "',''," + str(is_teacher) + ");")
         # con.commit()
-        addUser(email, hashed_password, is_teacher)
-        user = User()
-        user.id = email
-        login_user(user)
-        session.permanent = True
-        return jsonify({"message": "User registered successfully"})
-    except psycopg2.IntegrityError:
+    if checkExists("users", "email='" + email + "'"):
         return jsonify({"error": "Email already in use"}), 409
+    addUser(email, hashed_password, is_teacher)
+    user = User()
+    user.id = email
+    login_user(user)
+    return jsonify({"message": "User registered successfully"})
 
 # Login function
 def login(req):
