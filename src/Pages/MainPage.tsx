@@ -1,21 +1,20 @@
 import React, { useState, useEffect } from 'react';
+import {Route, Routes, Navigate, BrowserRouter as Router} from 'react-router-dom';
 import Calendar from 'react-calendar';
+import Schedule from "./Schedule";
+import Login2 from "../Pages/Login2";
+import '../Styles/Table.css';
 import '../Styles/MainPage.css';
 import 'react-calendar/dist/Calendar.css';
 
 function MainPage() {
-    const [date, setDate] = useState(new Date());
-  
+    if(globalThis.userName === null || globalThis.userName === undefined) {return (<Login2/>);}
     return (
       <div className ='app'>
         <h2 className ='text-center'>Office Hours Calendar</h2>
         <div className ='calendar-container'>
-          <Calendar className ='calendar' onChange = {setDate as any} value = {date}/>
+          <Schedule/>
         </div>
-        <p className ='text-center'>
-          <span className ='bold'>Selected Date: </span>{' '}
-          {date.toDateString()}
-        </p>
       </div>
     );
   }

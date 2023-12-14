@@ -1,0 +1,20 @@
+.navbar {
+  background-color: #333;
+  overflow: hidden;
+  text-align: left; /* Align buttons to the left */
+}
+
+.navbar button {
+  display: inline-block;
+  text-align: center;
+  padding: 14px 20px; /* Adjust padding as needed */
+  text-decoration: none;
+  font-size: 16px;
+  border: none;
+  cursor: pointer;
+  margin-right: 10px; /* Adjust the space between buttons */
+}
+
+.navbar button:last-child {
+  margin-right: 0; /* Remove margin from the last button */
+}

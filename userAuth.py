@@ -10,7 +10,6 @@ import datetime
 # from backendAPI import readConnect, writeConnect
 # Can't import due to circular import
 
-
 #returns a connection with the master account
 #remove in final version and replace with some account that only has permission to make, delete, and update table entries in the officehours db
 def connect():
@@ -20,12 +19,10 @@ def connect():
         user = "fivestar",
         password = "O6OKCxDLB4Ij2zETe2Al")
 
-
 #returns a read only connection to the database
 # DO LATER
 def readConnect():
     return connect().cursor()
-
 
 #returns a writable connection to the database
 # DO LATER
@@ -33,14 +30,12 @@ def readConnect():
 def writeConnect():
     return connect()
 
-
 # returns a string of 60 zeros separated by commas
 def stringEmptySchedule():
     string = "0"
     for i in range(59):
         string += ",0"
     return string
-
 
 #checks if some object exists in a table
 # table: string, the table to look in
@@ -51,7 +46,6 @@ def checkExists(table, where):
     if(cur.fetchone() == None):
         return False
     return True
-
 
 #adds a user to the databases
 # returns 0 on success
@@ -70,11 +64,9 @@ def addUser(email, password, role):
 # Initialize the login manager
 login_manager = LoginManager()
 
-
 # User class for Flask-Login
 class User(UserMixin):
     pass
-
 
 # User Loader for Flask-Login
 @login_manager.user_loader
@@ -85,7 +77,6 @@ def user_loader(email):
     if record is None:
         return None
 
-
     user = User()
     user.id = email
     return user
@@ -95,15 +86,12 @@ def user_loader(email):
 # def unauthorized_handler():
 #     return {"error":'Unauthorized'}, 401
 
-
 # Function to register a new user
 def register_user(email, password, is_teacher):
-    # Validate email
+
     if not is_valid_umass_email(email):
         return jsonify({"error": "Invalid email format"}), 400
 
-
-    # Validate password
     valid, message = validate_password(password)
     if not valid:
         return jsonify({"error": message}), 400
@@ -259,4 +247,5 @@ email = "example@umass.edu"
 if is_valid_umass_email(email):
     print("Valid UMass email")
 else:
+    print("Invalid UMass email")
     print("Invalid UMass email")
